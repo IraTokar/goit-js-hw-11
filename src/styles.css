@@ -1,13 +1,103 @@
+body {
+    background-color: gray;
+}
+
+a {
+    text-decoration: none;
+}
+
+.search-form input {
+    border-radius: 4px 0 0 4px;
+    border: none;
+    outline: none;
+    background-color: #f8f8f8;
+    padding: 8px 10px;
+    font: inherit;
+}
+
+.search-form button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    background-color: #c8c8c8;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+
 .search-form {
     display: flex;
     justify-content: center;
 }
 
 .section {
-    background-color: blue;
+    background-color: rgb(37, 37, 42);
     padding: 10px 0px;
     margin-top: -8px;
     margin-left: -8px;
     position: fixed;
     width: 100%;
 }
+
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+    padding-top: 60px;
+
+}
+
+.gallery-link {
+    flex-basis: calc((100% - 90px) / 4);
+        box-shadow: 0px 2px 1px 0px rgba(0, 0, 0, .2), 0px 1px 1px 0px rgba(0, 0, 0, .14), 0px 1px 3px 0px rgba(0, 0, 0, .12);
+            background-color: var(--main-background-color);
+                border-radius: 0px 0px 4px 4px;
+}
+.gallery-link:hover,
+.gallery-link:focus {
+    box-shadow: 1px 4px 6px 0px rgba(0, 0, 0, 0.16), 0px 4px 4px 0px rgba(0, 0, 0, 0.06), 0px 1px 1px 0px rgba(0, 0, 0, 0.12);
+}
+
+img {
+        display: block;
+            height: 30vh;
+            width: 40vh;
+            object-fit: cover;
+}
+
+.info {
+    display: flex;
+    justify-content: space-around;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: black;
+}
+
+.load-more.is-hidden {
+    display: none;
+}
+
+.load-more {
+    display: block;
+    margin: 25px auto 0 auto;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: transparent;
+    box-shadow: 0 1px 2px 0 rgb(60 64 67 / 30%), 0 2px 6px 2px rgb(60 64 67 / 15%);
+    font: inherit;
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+}
+
+.load-more:hover {
+    cursor: pointer;
+    background-color: #fbfbfb;
+    border-color: darkgrey;
+}
+
