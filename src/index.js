@@ -82,7 +82,7 @@ function onSearchForm(evt) {
              buttonLoadMore.classList.remove('is-hidden');
         }
         })
-        .catch(error => comsole.log(error))
+        .catch(error => console.log(error))
         .finally(() => form.reset())
 };
 
