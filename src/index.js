@@ -97,7 +97,7 @@ function onLoadMoreBtn() {
 
             const totalPages = Math.ceil(data.totalHits / perPage);
 
-            if (page > totalPages) {
+            if (page === totalPages) {
                 buttonLoadMore.classList.add('is-hidden');
                 Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
             };
