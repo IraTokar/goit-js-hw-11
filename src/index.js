@@ -1,5 +1,5 @@
 import Notiflix from 'notiflix';
-import { fetchImages } from './fetch-images'
+import PicsApi from './fetch-images'
 import SimpleLightbox from 'simplelightbox';
 
 import 'simplelightbox/dist/simple-lightbox.min.css';
@@ -7,18 +7,8 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 const form = document.querySelector('#search-form');
 const gallery = document.querySelector('.gallery');
 const buttonLoadMore = document.querySelector('.load-more')
-
-let query = '';
-let page = 1;
-const perPage = 40;
-
+const picsApi = new PicsApi();
 let simpleLightBox;
-
-
-form.addEventListener('submit', onSearchForm);
-buttonLoadMore.addEventListener('click', onLoadMoreBtn);
-
-
 
 function renderGallery(img) {
     const markup = img.map(img => {
@@ -51,60 +41,136 @@ function renderGallery(img) {
     gallery.insertAdjacentHTML('beforeend', markup);
 };
 
+form.addEventListener('submit', onSearchForm);
+buttonLoadMore.addEventListener('click', onLoadMoreBtn);
 
-function onSearchForm(evt) {
-    evt.preventDefault(evt);
-    window.scrollTo({ top: 0 });
-    page = 1;
-    query = evt.currentTarget.searchQuery.value.trim();
+
+async function onSearchForm(evt) {
+  evt.preventDefault();
+
+  picsApi.query = evt.currentTarget.elements.searchQuery.value.trim();
+  picsApi.resetPage();
     gallery.innerHTML = '';
     buttonLoadMore.classList.add('is-hidden');
+    window.scrollTo({ top: 0 });
 
-    if (query === '') {
-        Notiflix.Notify.failure('The search string cannot be empty. Please specify your search query.');
+  if (picsApi.query === '') {
+    Notiflix.Notify.failure('The search string cannot be empty. Please specify your search query.');
         return;
-    };
+  }
 
-    fetchImages(query, page, perPage)
-        .then(({ data }) => {
-            if(data.totalHits === 0) {
-                Notiflix.Notify.failure(
-                'Sorry, there are no images matching your search query. Please try again.',
-                );
-            }else {
-                renderGallery(data.hits);
-                simpleLightBox = new SimpleLightbox('.gallery a').refresh();
-                Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
-            
-        };
+  try {
+    const { totalHits, hits } = await picsApi.fetchImages();
 
-        if (data.totalHits > perPage) {
-             buttonLoadMore.classList.remove('is-hidden');
-        }
-        })
-        .catch(error => console.log(error))
-        .finally(() => form.reset())
+      if (hits.length === 0) {
+        
+      Notiflix.Notify.failure(
+        '"Sorry, there are no images matching your search query. Please try again."'
+      );
+      return;
+      } 
+      
+    buttonLoadMore.classList.remove('is-hidden') 
+    renderGallery(hits);
+    simpleLightBox = new SimpleLightbox('.gallery a').refresh();
+    Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+  } catch (error) {
+    Notiflix.Notify.failure('Oops something gone wrong..');
+    console.log(error);
+  }
 };
 
-function onLoadMoreBtn() {
-    page += 1;
-    simpleLightBox.destroy();
+const perPage = 40;
 
-    fetchImages(query, page, perPage)
-        .then(({ data }) => {
-            renderGallery(data.hits);
+async function onLoadMoreBtn() {
+  picsApi.page += 1;
+    
+    simpleLightBox.destroy();
+  try {
+      const { totalHits, hits } = await picsApi.fetchImages();
+        renderGallery(hits);
             simpleLightBox = new SimpleLightbox('.gallery a').refresh();
 
-            const totalPages = Math.ceil(data.totalHits / perPage);
+      const totalPages = Math.ceil(totalHits / perPage);
 
-            if (page === totalPages) {
-                buttonLoadMore.classList.add('is-hidden');
-                Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
-            };
-        })
-        .catch(error =>console.log(error))
+      if (totalPages === picsApi.page) {
+          buttonLoadMore.classList.add('is-hidden');
+      return Notiflix.Notify.failure(
+        "We're sorry, but you've reached the end of search results."
+      );
+    }
+    
+    
+  } catch (error) {
+    console.log(error);
+  }
+}
 
-};
+
+// let query = '';
+// let page = 1;
+// const perPage = 40;
+
+
+
+
+
+
+// function onSearchForm(evt) {
+//     evt.preventDefault(evt);
+//     window.scrollTo({ top: 0 });
+//     page = 1;
+//     query = evt.currentTarget.searchQuery.value.trim();
+//     gallery.innerHTML = '';
+//     buttonLoadMore.classList.add('is-hidden');
+
+//     if (query === '') {
+//         Notiflix.Notify.failure('The search string cannot be empty. Please specify your search query.');
+//         return;
+//     };
+
+//     fetchImages(query, page, perPage)
+//         .then(({ data }) => {
+//             if(data.totalHits === 0) {
+//                 Notiflix.Notify.failure(
+//                 'Sorry, there are no images matching your search query. Please try again.',
+//                 );
+//             }else {
+//                 renderGallery(data.hits);
+//                 simpleLightBox = new SimpleLightbox('.gallery a').refresh();
+//                 Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
+            
+//         };
+
+//         if (data.totalHits > perPage) {
+//              buttonLoadMore.classList.remove('is-hidden');
+//         }
+//         })
+//         .catch(error => console.log(error))
+//         .finally(() => form.reset())
+   
+//     }
+
+
+// function onLoadMoreBtn() {
+//     page += 1;
+//     simpleLightBox.destroy();
+
+//     fetchImages(query, page, perPage)
+//         .then(({ data }) => {
+//             renderGallery(data.hits);
+//             simpleLightBox = new SimpleLightbox('.gallery a').refresh();
+
+//             const totalPages = Math.ceil(data.totalHits / perPage);
+
+//             if (page === totalPages) {
+//                 buttonLoadMore.classList.add('is-hidden');
+//                 Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
+//             };
+//         })
+//         .catch(error =>console.log(error))
+
+// };
 
 
 
